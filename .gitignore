@@ -1,0 +1,13 @@
+config.properties
+
+# Backup files
+*.bak
+
+# Maven build
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.DS_Store
