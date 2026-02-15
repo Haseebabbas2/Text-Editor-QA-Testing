@@ -1,61 +1,58 @@
 package dal;
+
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import dto.Pages;
+import java.util.List;
 
 public class PaginationDAOTest {
-    private PaginationDAO pagDao;
-    
-    @BeforeEach
-    public void setUp() { pagDao = new PaginationDAO(); }
     
     @Test
-    @DisplayName("500 words exact boundary")
-    public void testBoundary500() {
-        String content = generateWords(500);
-        int pages = pagDao.calculatePages(content, 500);
-        assertEquals(1, pages);
+    @DisplayName("Empty content returns single page with empty content")
+    public void testEmptyContent() {
+        List<Pages> pages = PaginationDAO.paginate("");
+        assertNotNull(pages);
+        assertEquals(1, pages.size());
+        assertEquals(1, pages.get(0).getPageNumber());
     }
     
     @Test
-    @DisplayName("501 words creates 2 pages")
-    public void testOver500() {
-        String content = generateWords(501);
-        int pages = pagDao.calculatePages(content, 500);
-        assertEquals(2, pages);
+    @DisplayName("Null content returns single page")
+    public void testNullContent() {
+        List<Pages> pages = PaginationDAO.paginate(null);
+        assertNotNull(pages);
+        assertEquals(1, pages.size());
     }
     
-    private String generateWords(int count) {
+    @Test
+    @DisplayName("Content with exactly 100 characters creates 1 page")
+    public void testExactly100Chars() {
+        String content = generateContent(100);
+        List<Pages> pages = PaginationDAO.paginate(content);
+        assertEquals(1, pages.size());
+    }
+    
+    @Test
+    @DisplayName("Content with 101 characters creates 2 pages")
+    public void testOver100Chars() {
+        String content = generateContent(101);
+        List<Pages> pages = PaginationDAO.paginate(content);
+        assertEquals(2, pages.size());
+    }
+    
+    @Test
+    @DisplayName("Content with 200 characters creates 2 pages")
+    public void test200Chars() {
+        String content = generateContent(200);
+        List<Pages> pages = PaginationDAO.paginate(content);
+        assertEquals(2, pages.size());
+    }
+    
+    private String generateContent(int length) {
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i<count; i++) sb.append("word ");
+        for(int i = 0; i < length; i++) {
+            sb.append("a");
+        }
         return sb.toString();
     }
 }
-```
-
-Run: `mvn test`
-
----
-
-### 2️⃣ WHITE-BOX ANALYSIS (CFG, Complexity)
-
-**Method 1: SearchWord (bll/SearchWord.java file dekho)**
-
-**Control Flow Graph:**
-- Draw.io use karo: https://app.diagrams.net/
-- Nodes: Entry, if checks, return statements
-- Calculate: V(G) = E - N + 2P
-
-**Example:**
-```
-Edges (E) = 7
-Nodes (N) = 6  
-P = 1
-V(G) = 7 - 6 + 2(1) = 3
-```
-
-**Test Paths:**
-```
-P = {p1, p2, p3}
-p1 = ⟨1,2,3⟩ (null path)
-p2 = ⟨1,2,4,5,6⟩ (not found)
-p3 = ⟨1,2,4,5,7,8⟩ (success)
